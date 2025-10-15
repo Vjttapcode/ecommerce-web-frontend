@@ -1,0 +1,11 @@
+# Angular/Node
+node_modules/
+dist/
+out-tsc/
+coverage/
+.angular/cache/
+
+# Logs & tạm
+*.log
+*.tsbuildinfo
+tmp/
