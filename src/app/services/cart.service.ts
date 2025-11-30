@@ -14,6 +14,7 @@ export class CartService {
   totalQuantity: Subject<number> = new BehaviorSubject<number>(0);
 
   storage: Storage = sessionStorage;
+  //storage: Storage = localStorage; -> survive browser restart
   constructor() {
     //read data from storage
     let data = JSON.parse(this.storage.getItem("cartItems")!);
