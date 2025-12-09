@@ -44,6 +44,8 @@ export class CheckoutComponent implements OnInit {
   paymentInfo: PaymentInfo = new PaymentInfo();
   cardElement: any;
   displayError: any = "";
+
+  isDisabled: boolean = false;
   constructor(
     private formBuilder: FormBuilder,
     private luv2ShopFormService: Luv2ShopFormService,
@@ -331,6 +333,7 @@ export class CheckoutComponent implements OnInit {
       !this.checkoutFormGroup.invalid &&
       this.displayError.textContent === ""
     ) {
+      this.isDisabled = true;
       this.checkoutService
         .createPaymentIntent(this.paymentInfo)
         .subscribe((paymentIntentResponse) => {
@@ -340,6 +343,17 @@ export class CheckoutComponent implements OnInit {
               {
                 payment_method: {
                   card: this.cardElement,
+                  billing_details: {
+                    email: purchase.customer.email,
+                    name: `${purchase.customer.firstName} ${purchase.customer.lastName}`,
+                    address: {
+                      line1: purchase.billingAddress.street,
+                      city: purchase.billingAddress.city,
+                      state: purchase.billingAddress.state,
+                      postal_code: purchase.billingAddress.zipCode,
+                      country: this.billingAddressCountry?.value.code,
+                    },
+                  },
                 },
               },
               { handleActions: false }
@@ -348,6 +362,7 @@ export class CheckoutComponent implements OnInit {
               if (result.error) {
                 //inform the customer there was an error
                 alert(`There was an error: ${result.error.message}`);
+                this.isDisabled = false;
               } else {
                 //call REST API via the checkoutService
                 this.checkoutService.placeOrder(purchase).subscribe({
@@ -357,9 +372,11 @@ export class CheckoutComponent implements OnInit {
                     );
 
                     this.resetCart();
+                    this.isDisabled = false;
                   },
                   error: (err: any) => {
                     alert(`There was an error: ${err.message}`);
+                    this.isDisabled = false;
                   },
                 });
               }
