@@ -318,9 +318,10 @@ export class CheckoutComponent implements OnInit {
     purchase.billingAddress.country = billingCountry.name;
 
     //compute payment info
-    this.paymentInfo.amount = this.totalPrice * 100;
+    this.paymentInfo.amount = Math.round(this.totalPrice * 100);
     this.paymentInfo.currency = "USD";
 
+    console.log(`Payment amount: ${this.paymentInfo.amount}`);
     //if valid form then
     // - create payment intent
     // - confirm card payment
@@ -334,7 +335,7 @@ export class CheckoutComponent implements OnInit {
         .createPaymentIntent(this.paymentInfo)
         .subscribe((paymentIntentResponse) => {
           this.stripe
-            .comfirmCardPayment(
+            .confirmCardPayment(
               paymentIntentResponse.client_secret,
               {
                 payment_method: {
@@ -376,6 +377,8 @@ export class CheckoutComponent implements OnInit {
     this.cartService.totalQuantity.next(0);
     //reset the form data
     this.checkoutFormGroup.reset();
+    //reset the storage
+    this.cartService.persistCartItems();
     //navigate back to products page
     this.router.navigateByUrl("/products");
   }
